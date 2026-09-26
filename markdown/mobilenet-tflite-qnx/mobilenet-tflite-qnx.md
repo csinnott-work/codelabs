@@ -120,7 +120,7 @@ ls -lh ~/*.tflite ~/labels.txt ~/labelmap.txt
 
 MobileNetV2 was trained on ImageNet — 1000 everyday object categories plus a catch-all background class for images that don't clearly belong to any of them. Given a photograph, it returns a confidence score for each class; the highest score is the model's prediction.
 
-The model requires color images resized to exactly 224×224 pixels, with each pixel value expressed as a decimal in the range 0.0–1.0 rather than the standard 0–255 integer. This scaling is called normalisation — it must match what the model saw during training, otherwise predictions will be wrong. The `classify.py` script handles both the resizing and normalisation automatically before running inference.
+The model requires color images resized to exactly 224×224 pixels, with each pixel value expressed as a decimal in the range 0.0–1.0 rather than the standard 0–255 integer. This scaling is called normalization — it must match what the model saw during training, otherwise predictions will be wrong. The `classify.py` script handles both the resizing and normalization automatically before running inference.
 
 ![David Saint-Jacques NASA portrait with MobileNetV2 top-5 classification results](classify_result.png)
 
@@ -183,7 +183,7 @@ inp = interp.get_input_details()[0]
 out = interp.get_output_details()[0]
 h, w = inp['shape'][1], inp['shape'][2]
 
-# Resize the image to the model's required dimensions, then normalise pixels from 0–255 to 0.0–1.0
+# Resize the image to the model's required dimensions, then normalize pixels from 0–255 to 0.0–1.0
 img  = Image.open(IMAGE).convert('RGB').resize((w, h))
 data = np.expand_dims(np.array(img, dtype=np.float32) / 255.0, axis=0)
 
@@ -240,7 +240,7 @@ The key TFLite API calls used here are:
 
 SSD MobileNet V1 was trained on COCO — Common Objects in Context, a dataset covering 80 everyday categories such as people, vehicles, and furniture. Unlike the classifier, which produces a single answer for the whole image, the detector reports every object it finds, each described by four pieces of information: where it is (a bounding box), what it is (a class label), how confident the model is (a score), and a total count of valid detections.
 
-This model is *quantised* — its weights have been compressed to use 8-bit integers rather than 32-bit decimals, making it smaller and faster. As a result it expects raw pixel bytes (0–255) as input rather than the normalised decimals used by MobileNetV2. The model handles the internal scaling itself.
+This model is *quantized* — its weights have been compressed to use 8-bit integers rather than 32-bit decimals, making it smaller and faster. As a result it expects raw pixel bytes (0–255) as input rather than the normalized decimals used by MobileNetV2. The model handles the internal scaling itself.
 
 ![Street scene with SSD MobileNet detection boxes showing bicycle and car detections](street_detect.png)
 
@@ -277,7 +277,7 @@ The input shape follows the same `[batch, height, width, channels]` pattern as t
 | `outs[2]` | `[1, 10]` | Confidence score for each detection slot |
 | `outs[3]` | `[1]` | Number of valid detections in the 10 slots |
 
-> **uint8 input:** Unlike `classify.py`, this script passes raw pixel integers (0–255) directly to the model. No normalisation step is needed — the scaling is built into the model's quantised weights.
+> **uint8 input:** Unlike `classify.py`, this script passes raw pixel integers (0–255) directly to the model. No normalization step is needed — the scaling is built into the model's quantized weights.
 
 > **Label offset:** The `labelmap.txt` file has a background class `???` at line 0 and real COCO classes from line 1 onward. The model outputs 0-indexed class IDs where 0 = the first real class ("person"), so add 1 when indexing into the label file.
 
@@ -308,7 +308,7 @@ inp  = interp.get_input_details()[0]
 outs = interp.get_output_details()
 _, h, w, _ = inp['shape']
 
-# Detection model expects raw uint8 pixels (0–255), not normalised floats
+# Detection model expects raw uint8 pixels (0–255), not normalized floats
 img  = Image.open(IMAGE).convert('RGB').resize((w, h))
 data = np.expand_dims(np.array(img, dtype=np.uint8), axis=0)
 
@@ -359,7 +359,7 @@ Bounding box coordinates are fractions of the image dimensions. Multiply by pixe
 
 [Semantic segmentation](https://huggingface.co/tasks/image-segmentation) answers: *what class does each pixel belong to?*
 
-DeepLab v3 was trained on PASCAL VOC — a dataset covering 21 categories including people, animals, and common vehicles. Rather than labelling the image as a whole, it assigns a category to every individual pixel, producing a complete map of what is where in the scene.
+DeepLab v3 was trained on PASCAL VOC — a dataset covering 21 categories including people, animals, and common vehicles. Rather than labeling the image as a whole, it assigns a category to every individual pixel, producing a complete map of what is where in the scene.
 
 For each pixel in the 257×257 output grid, the model produces a raw score for all 21 possible categories. The script then picks the category with the highest score at each pixel — a step called `argmax` — resulting in a 257×257 grid where every cell contains a single category label. The output tensor shape `[1, 257, 257, 21]` encodes this directly: one image, 257×257 pixel positions, 21 scores per position.
 
@@ -367,7 +367,7 @@ For each pixel in the 257×257 output grid, the model produces a raw score for a
 
 The 21 categories are: background (catch-all for pixels that don't match any category), aeroplane, bicycle, bird, boat, bottle, bus, car, cat, chair, cow, diningtable, dog, horse, motorbike, person, pottedplant, sheep, sofa, train, tvmonitor.
 
-> **Different normalisation:** MobileNetV2 scales pixel values to the range 0.0–1.0 by dividing by 255. DeepLab uses a different range, −1.0 to 1.0, achieved with `(pixel / 127.5) − 1.0`. Using the wrong formula produces incorrect segmentation maps — the two models were trained differently and each expects its own scale.
+> **Different normalization:** MobileNetV2 scales pixel values to the range 0.0–1.0 by dividing by 255. DeepLab uses a different range, −1.0 to 1.0, achieved with `(pixel / 127.5) − 1.0`. Using the wrong formula produces incorrect segmentation maps — the two models were trained differently and each expects its own scale.
 
 ### Write and run the segmentation script
 
@@ -382,7 +382,7 @@ import tflite_runtime.interpreter as tflite
 MODEL  = 'deeplabv3_257.tflite'
 IMAGE  = sys.argv[1] if len(sys.argv) > 1 else 'test.jpg'
 
-# The 21 PASCAL VOC classes this model was trained to recognise — index matches the model's class axis
+# The 21 PASCAL VOC classes this model was trained to recognize — index matches the model's class axis
 PASCAL = [
     'background', 'aeroplane', 'bicycle', 'bird', 'boat', 'bottle',
     'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse',
@@ -397,7 +397,7 @@ inp = interp.get_input_details()[0]
 out = interp.get_output_details()[0]
 _, h, w, _ = inp['shape']
 
-# Resize and normalise to the range [-1, 1] — DeepLab uses a different scale than MobileNetV2
+# Resize and normalize to the range [-1, 1] — DeepLab uses a different scale than MobileNetV2
 img  = Image.open(IMAGE).convert('RGB').resize((w, h))
 data = np.expand_dims((np.array(img, dtype=np.float32) / 127.5) - 1.0, axis=0)
 
@@ -443,16 +443,16 @@ Add these lines at the end of `segment.py` to write a PNG where each class gets 
 
 ```python
 # One RGB color per PASCAL VOC class — index matches the class ID in seg_map
-COLOURS = [
+COLORS = [
     (0,0,0),(128,0,0),(0,128,0),(128,128,0),(0,0,128),(128,0,128),
     (0,128,128),(128,128,128),(64,0,0),(192,0,0),(64,128,0),(192,128,0),
     (64,0,128),(192,0,128),(64,128,128),(192,128,128),(0,64,0),(128,64,0),
     (0,192,0),(128,192,0),(0,64,128),
 ]
 # Use each pixel's class ID as an index into the color table to produce an RGB image
-seg_rgb = np.array(COLOURS, dtype=np.uint8)[seg_map]
+seg_rgb = np.array(COLORS, dtype=np.uint8)[seg_map]
 Image.fromarray(seg_rgb).save('segmentation.png')
-print("Colour map saved to segmentation.png")
+print("Color map saved to segmentation.png")
 ```
 
 ---
@@ -626,6 +626,6 @@ The composite result images shown in this codelab were generated with standalone
 
 ### What to explore next
 
-* **Quantised models** — uint8 variants of MobileNetV2 are 4× smaller and typically 2–3× faster; the API is identical.
+* **Quantized models** — uint8 variants of MobileNetV2 are 4× smaller and typically 2–3× faster; the API is identical.
 * **EfficientNet-Lite0/2** — higher accuracy than MobileNetV2 at similar latency; the `classify.py` script works without changes.
 * **Camera pipeline** — the models in this codelab run fast enough for real-time camera input on the Raspberry Pi 5. The [MediaPipe Camera Sample](https://qnx.github.io/codelabs/mediapipe-camera-sample/) codelab is the natural next step: it wires a live camera feed into a MediaPipe detection graph running on QNX, building directly on the inference concepts covered here.
