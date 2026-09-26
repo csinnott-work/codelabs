@@ -1,5 +1,5 @@
 id: mobilenet-tflite-qnx
-title: MobileNet Inference on QNX with TensorFlow Lite
+title: Run MobileNet Inference on QNX with TensorFlow Lite
 summary: Run image classification, object detection, and semantic segmentation on QNX 8.0 using the TFLite runtime and MobileNet family models.
 categories: qnx, ai
 tags: intermediate
@@ -8,7 +8,7 @@ status: published
 authors: Cris Sinnott
 feedback_link: https://github.com/qnx/codelabs/issues
 
-# MobileNet Inference on QNX with TensorFlow Lite
+# Run MobileNet Inference on QNX with TensorFlow Lite
 
 ## Introduction
 
