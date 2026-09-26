@@ -73,7 +73,7 @@ cd ~
 
 # MobileNetV2 — image classification (float32, ~14 MB)
 curl -sL -o mobilenet_v2.tflite \
-  "https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v2_1.0_224.tflite"
+  "https://github.com/tensorflow/tflite-support/raw/master/tensorflow_lite_support/metadata/python/tests/testdata/image_classifier/mobilenet_v2_1.0_224.tflite"
 
 # ImageNet labels (1001 classes, line 0 = background)
 curl -sL -o labels.txt \
@@ -82,11 +82,7 @@ curl -sL -o labels.txt \
 # SSD MobileNet V1 — object detection (uint8, COCO, ~7 MB)
 curl -sL -o detect.zip \
   "https://storage.googleapis.com/download.tensorflow.org/models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip"
-unzip -o detect.zip detect.tflite && rm detect.zip
-
-# COCO labelmap
-curl -sL -o labelmap.txt \
-  "https://storage.googleapis.com/download.tensorflow.org/models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29/labelmap.txt"
+unzip -o detect.zip detect.tflite labelmap.txt && rm detect.zip
 
 # DeepLab v3 — semantic segmentation (float32, PASCAL VOC, ~3.5 MB)
 curl -sL -o deeplabv3_257.tflite \
