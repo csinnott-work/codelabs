@@ -120,7 +120,7 @@ ls -lh ~/*.tflite ~/labels.txt ~/labelmap.txt
 
 MobileNetV2 was trained on ImageNet — 1000 everyday object categories plus a catch-all background class for images that don't clearly belong to any of them. Given a photograph, it returns a confidence score for each class; the highest score is the model's prediction.
 
-The model requires colour images resized to exactly 224×224 pixels, with each pixel value expressed as a decimal in the range 0.0–1.0 rather than the standard 0–255 integer. This scaling is called normalisation — it must match what the model saw during training, otherwise predictions will be wrong. The `classify.py` script handles both the resizing and normalisation automatically before running inference.
+The model requires color images resized to exactly 224×224 pixels, with each pixel value expressed as a decimal in the range 0.0–1.0 rather than the standard 0–255 integer. This scaling is called normalisation — it must match what the model saw during training, otherwise predictions will be wrong. The `classify.py` script handles both the resizing and normalisation automatically before running inference.
 
 ![David Saint-Jacques NASA portrait with MobileNetV2 top-5 classification results](classify_result.png)
 
@@ -147,11 +147,11 @@ Input  #0: shape=[1, 224, 224, 3]  dtype=float32
 Output #0: shape=[1, 1001]  dtype=float32
 ```
 
-The input shape `[1, 224, 224, 3]` encodes one 224×224 colour image. The four dimensions are `[batch, height, width, channels]`:
+The input shape `[1, 224, 224, 3]` encodes one 224×224 color image. The four dimensions are `[batch, height, width, channels]`:
 
 * **batch** — how many images are passed in a single call. We use `1` because on a device we classify one image at a time. During model training, large batches are processed simultaneously for efficiency; at inference we don't need that.
 * **height / width** — the fixed pixel dimensions the model was trained on. Any input image must be resized to 224×224 before it can be passed in.
-* **channels** — the three colour planes: Red, Green, and Blue. The model was trained on colour images and expects all three.
+* **channels** — the three color planes: Red, Green, and Blue. The model was trained on color images and expects all three.
 
 The output shape `[1, 1001]` is one confidence score per class — the 1000 ImageNet categories plus the background class — for each image in the batch.
 
@@ -437,19 +437,19 @@ Top-3 pixel classes:
   background      38.7% of pixels
 ```
 
-### Save a colour-coded segmentation map
+### Save a color-coded segmentation map
 
-Add these lines at the end of `segment.py` to write a PNG where each class gets a distinct colour:
+Add these lines at the end of `segment.py` to write a PNG where each class gets a distinct color:
 
 ```python
-# One RGB colour per PASCAL VOC class — index matches the class ID in seg_map
+# One RGB color per PASCAL VOC class — index matches the class ID in seg_map
 COLOURS = [
     (0,0,0),(128,0,0),(0,128,0),(128,128,0),(0,0,128),(128,0,128),
     (0,128,128),(128,128,128),(64,0,0),(192,0,0),(64,128,0),(192,128,0),
     (64,0,128),(192,0,128),(64,128,128),(192,128,128),(0,64,0),(128,64,0),
     (0,192,0),(128,192,0),(0,64,128),
 ]
-# Use each pixel's class ID as an index into the colour table to produce an RGB image
+# Use each pixel's class ID as an index into the color table to produce an RGB image
 seg_rgb = np.array(COLOURS, dtype=np.uint8)[seg_map]
 Image.fromarray(seg_rgb).save('segmentation.png')
 print("Colour map saved to segmentation.png")
@@ -602,7 +602,7 @@ Task                                       Avg (ms)     FPS  Top result
   Segmentation    (DeepLab v3 257)            10.4    96.5  person
 ```
 
-> **Note on FPS:** The FPS column is a projected figure — `1000 ÷ avg_ms` — representing how many frames per second the model alone could sustain if fed images back-to-back with no other overhead. In practice a real camera pipeline also pays for frame capture, colour conversion, and OS scheduling, so effective throughput will be lower. That said, classification at ~41 FPS and detection at ~26 FPS on the Raspberry Pi 5 leave meaningful headroom against a standard 30fps camera feed, making these models practical for real-time use on the target.
+> **Note on FPS:** The FPS column is a projected figure — `1000 ÷ avg_ms` — representing how many frames per second the model alone could sustain if fed images back-to-back with no other overhead. In practice a real camera pipeline also pays for frame capture, color conversion, and OS scheduling, so effective throughput will be lower. That said, classification at ~41 FPS and detection at ~26 FPS on the Raspberry Pi 5 leave meaningful headroom against a standard 30fps camera feed, making these models practical for real-time use on the target.
 
 > **Tip:** Run the benchmark a second time to see steady-state numbers. The first run includes Python import overhead and XNNPACK kernel cache warm-up. Subsequent runs are representative of production throughput.
 
